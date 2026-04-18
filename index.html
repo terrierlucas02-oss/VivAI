@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#C0392B">
+<title>VivAI — Bêta SPB Beuzeville</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--red:#C0392B;--red2:#A93226;--red3:#922B21;--red-light:#FDECEA;--red-border:rgba(192,57,43,0.2);--bg:#F2F4F6;--bg2:#FFFFFF;--bg3:#ECEEF2;--text:#111827;--muted:#6B7280;--dim:#9CA3AF;--border:#E5E7EB}
+body{background:var(--bg);font-family:'Nunito',sans-serif;color:var(--text);min-height:100vh}
+.app{max-width:860px;margin:0 auto;display:flex;flex-direction:column;min-height:100vh}
+.header{background:var(--bg2);border-bottom:1px solid var(--border);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.logo{font-family:'Playfair Display',serif;font-size:22px;font-weight:900;color:var(--text)}
+.logo span{color:var(--red)}
+.beta-pill{font-size:8px;letter-spacing:2px;padding:2px 8px;background:var(--red-light);border:1px solid var(--red-border);color:var(--red);text-transform:uppercase;margin-left:6px;border-radius:10px}
+.urgence-btn{display:flex;align-items:center;gap:5px;padding:8px 14px;background:var(--red);color:#fff;border:none;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;font-family:'Nunito',sans-serif;border-radius:8px;font-weight:700}
+.pulse{width:6px;height:6px;border-radius:50%;background:#fff;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.6)}}
+.tabs{background:var(--bg2);border-bottom:1px solid var(--border);display:flex}
+.tab{flex:1;padding:12px 6px;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;border:none;background:transparent;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;font-family:'Nunito',sans-serif;font-weight:700;transition:all 0.2s}
+.tab.active{color:var(--red);border-bottom-color:var(--red);background:var(--red-light)}
+.panel{display:none;flex:1;flex-direction:column;padding:16px 20px}
+.panel.active{display:flex}
+/* Chatbot */
+.profile-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.prof-label{font-size:9px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;font-weight:700}
+.prof-btn{font-size:9px;letter-spacing:1px;padding:4px 12px;border:1.5px solid var(--border);cursor:pointer;color:var(--muted);font-family:'Nunito',sans-serif;background:var(--bg2);border-radius:20px;font-weight:700;transition:all 0.15s}
+.prof-btn.active{border-color:var(--red);color:var(--red);background:var(--red-light)}
+.chat-box{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;flex:1}
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;max-height:calc(100vh - 380px)}
+.msg{max-width:82%}
+.msg.ai{align-self:flex-start}
+.msg.user{align-self:flex-end}
+.msg-label{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:4px;font-weight:700}
+.msg.ai .msg-label{color:var(--red)}
+.msg.user .msg-label{color:var(--muted);text-align:right}
+.msg-bubble{padding:12px 16px;border-radius:12px;font-size:12px;line-height:1.7;font-weight:600}
+.msg.ai .msg-bubble{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-top-left-radius:4px}
+.msg.user .msg-bubble{background:var(--red);color:#fff;border-top-right-radius:4px}
+.typing-bubble{padding:12px 16px;background:var(--bg3);border:1px solid var(--border);border-radius:12px;border-top-left-radius:4px;display:flex;gap:4px}
+.td{width:7px;height:7px;border-radius:50%;background:var(--red);opacity:0.5;animation:tb 1.2s infinite}
+.td:nth-child(2){animation-delay:0.2s}
+.td:nth-child(3){animation-delay:0.4s}
+@keyframes tb{0%,60%,100%{transform:translateY(0);opacity:0.5}30%{transform:translateY(-5px);opacity:1}}
+.sugs{padding:10px 12px;background:var(--bg3);border-top:1px solid var(--border);display:flex;flex-wrap:wrap;gap:6px}
+.sug{font-size:10px;padding:5px 12px;border:1.5px solid var(--border);cursor:pointer;color:var(--muted);background:var(--bg2);font-family:'Nunito',sans-serif;border-radius:20px;font-weight:700;transition:all 0.15s}
+.sug:hover{border-color:var(--red);color:var(--red);background:var(--red-light)}
+.input-row{display:flex;border-top:1px solid var(--border)}
+.chat-input{flex:1;padding:14px 16px;border:none;background:var(--bg2);color:var(--text);font-size:12px;font-family:'Nunito',sans-serif;outline:none;font-weight:600}
+.chat-input::placeholder{color:var(--dim)}
+.send-btn{padding:14px 20px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:10px;font-family:'Nunito',sans-serif;font-weight:700;transition:background 0.15s}
+.send-btn:hover{background:var(--red2)}
+.send-btn:disabled{opacity:0.4;cursor:not-allowed}
+/* Formation */
+.gestes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+@media(max-width:480px){.gestes-grid{grid-template-columns:1fr 1fr}}
+.geste-card{background:var(--bg2);border:2px solid var(--border);border-radius:12px;padding:16px 12px;cursor:pointer;transition:all 0.2s;text-align:center}
+.geste-card:hover,.geste-card.active{border-color:var(--red);background:var(--red-light)}
+.geste-icon{font-size:26px;margin-bottom:6px}
+.geste-name{font-size:11px;font-weight:800;color:var(--text);line-height:1.3}
+.geste-card.active .geste-name{color:var(--red)}
+.video-player{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;margin-top:4px}
+.video-header{padding:14px 18px;background:var(--red-light);border-bottom:1px solid var(--red-border);display:flex;align-items:center;justify-content:space-between}
+.video-title{font-size:14px;font-weight:900;color:var(--red);font-family:'Playfair Display',serif}
+.close-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;padding:0 4px}
+.voice-bar{padding:12px 18px;background:#F0FDF4;border-bottom:1px solid #BBF7D0;display:flex;align-items:center;gap:10px}
+.voice-icon{width:32px;height:32px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;flex-shrink:0}
+.voice-text{flex:1;font-size:11px;color:#374151;line-height:1.5;font-weight:600}
+.voice-play{padding:6px 14px;background:var(--red);color:#fff;border:none;border-radius:20px;font-size:9px;letter-spacing:1px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;text-transform:uppercase;transition:background 0.15s}
+.voice-play:hover{background:var(--red2)}
+.voice-play.playing{background:var(--red3)}
+.yt-wrap{position:relative;padding-bottom:56.25%;height:0;background:#000}
+.yt-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none}
+.yt-source{padding:6px 18px;background:#F8F9FA;border-top:1px solid #E5E7EB;font-size:9px;color:#9CA3AF;font-weight:600}
+.tempo-section{padding:14px 18px;background:var(--red-light);border-top:1px solid var(--red-border);display:none}
+.tempo-section.visible{display:block}
+.tempo-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:10px}
+.tempo-row{display:flex;align-items:center;gap:12px}
+.tempo-heart{font-size:28px;transition:transform 0.1s}
+.tempo-heart.beat{transform:scale(1.3)}
+.tempo-info{flex:1}
+.tempo-count{font-family:'Playfair Display',serif;font-size:32px;font-weight:900;color:var(--red);line-height:1}
+.tempo-sub{font-size:10px;color:var(--muted);margin-top:2px;font-weight:600}
+.tempo-dots{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.tempo-dot{width:18px;height:18px;border-radius:50%;background:var(--border);transition:all 0.1s}
+.tempo-dot.done{background:var(--red)}
+.tempo-dot.current{background:var(--red);box-shadow:0 0 8px rgba(192,57,43,0.5);transform:scale(1.2)}
+.tempo-btn{padding:8px 16px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:10px;letter-spacing:1.5px;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;text-transform:uppercase;white-space:nowrap}
+.steps-section{padding:16px 18px}
+.steps-title{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:12px}
+.step-item{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px}
+.step-n{min-width:26px;height:26px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0}
+.step-n.crit{box-shadow:0 0 0 3px var(--red-light)}
+.step-txt{font-size:12px;color:var(--text);line-height:1.6;font-weight:600;padding-top:3px}
+.step-txt strong{color:var(--red)}
+.disclaimer{padding:10px 18px;background:var(--bg3);border-top:1px solid var(--border);font-size:9px;color:var(--dim);text-align:center;font-weight:600}
+/* Quiz */
+.quiz-header{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px;text-align:center;margin-bottom:16px}
+.quiz-title{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin-bottom:8px}
+.quiz-sub{font-size:11px;color:var(--muted);margin-bottom:18px;line-height:1.6;font-weight:600}
+.levels{display:flex;gap:8px;justify-content:center;margin-bottom:16px;flex-wrap:wrap}
+.lvl{padding:7px 16px;border:1.5px solid var(--border);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;background:var(--bg);color:var(--muted);font-family:'Nunito',sans-serif;border-radius:20px;font-weight:700;transition:all 0.15s}
+.lvl.active,.lvl:hover{border-color:var(--red);color:var(--red);background:var(--red-light)}
+.start-btn{padding:12px 28px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Nunito',sans-serif;border-radius:10px;font-weight:700}
+.quiz-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden}
+.quiz-bar{padding:12px 18px;background:var(--bg3);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.quiz-prog{font-size:10px;letter-spacing:1px;color:var(--muted);font-weight:700}
+.quiz-score{font-size:10px;letter-spacing:1px;color:var(--red);font-weight:700}
+.quiz-body{padding:20px 18px}
+.quiz-q{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--text);line-height:1.6;margin-bottom:18px}
+.quiz-opts{display:flex;flex-direction:column;gap:8px}
+.quiz-opt{padding:12px 16px;border:1.5px solid var(--border);background:var(--bg);cursor:pointer;font-size:11px;color:var(--muted);text-align:left;font-family:'Nunito',sans-serif;border-radius:10px;font-weight:700;transition:all 0.15s}
+.quiz-opt:hover:not(:disabled){border-color:var(--text);color:var(--text);background:var(--bg2)}
+.quiz-opt.correct{border-color:#16A34A;background:#F0FDF4;color:#15803D}
+.quiz-opt.wrong{border-color:var(--red);background:var(--red-light);color:var(--red)}
+.quiz-fb{margin-top:14px;padding:14px 16px;background:var(--bg3);border-left:3px solid var(--red);font-size:11px;color:var(--text);line-height:1.8;border-radius:0 10px 10px 0;font-weight:600}
+.quiz-next{margin-top:12px;padding:10px 22px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:9px;letter-spacing:2px;font-family:'Nunito',sans-serif;border-radius:8px;font-weight:700;text-transform:uppercase}
+/* Feedback */
+.fb-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:22px}
+.fb-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:6px}
+.fb-sub{font-size:11px;color:var(--muted);margin-bottom:20px;line-height:1.6;font-weight:600}
+.fb-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;font-weight:700}
+.fb-field{margin-bottom:14px}
+.fb-input,.fb-select,.fb-ta{width:100%;padding:10px 14px;border:1.5px solid var(--border);background:var(--bg3);color:var(--text);font-size:12px;font-family:'Nunito',sans-serif;border-radius:10px;outline:none;font-weight:600;transition:border-color 0.15s}
+.fb-input:focus,.fb-select:focus,.fb-ta:focus{border-color:var(--red)}
+.fb-ta{min-height:70px;resize:vertical}
+.stars{display:flex;gap:6px;margin-top:4px}
+.star{font-size:24px;cursor:pointer;color:var(--dim);transition:color 0.15s}
+.star.on{color:#F59E0B}
+.fb-btn{padding:11px 24px;background:var(--red);color:#fff;border:none;cursor:pointer;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:'Nunito',sans-serif;border-radius:10px;font-weight:700}
+.footer{padding:10px 20px;background:var(--bg2);border-top:1px solid var(--border);font-size:9px;color:var(--dim);text-align:center;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="header">
+  <div style="display:flex;align-items:center">
+    <div class="logo">Viv<span>AI</span></div>
+    <span class="beta-pill">Bêta SPB</span>
+  </div>
+  <button class="urgence-btn" onclick="goTab('formation')"><div class="pulse"></div>Urgence</button>
+</header>
+
+<nav class="tabs">
+  <button class="tab" onclick="goTab('accueil')" id="tab-accueil">Accueil</button>
+  <button class="tab active" onclick="goTab('chatbot')" id="tab-chatbot">Chatbot IA</button>
+  <button class="tab" onclick="goTab('formation')" id="tab-formation">Formation</button>
+  <button class="tab" onclick="goTab('quiz')" id="tab-quiz">Quiz</button>
+  <button class="tab" onclick="goTab('feedback')" id="tab-feedback">Feedback</button>
+</nav>
+
+<!-- ACCUEIL -->
+<div class="panel" id="panel-accueil" style="align-items:center;justify-content:center;text-align:center;gap:24px">
+  <div style="font-family:'Playfair Display',serif;font-size:52px;font-weight:900;color:var(--text);line-height:1">Viv<span style="color:var(--red)">AI</span></div>
+  <div style="font-size:11px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;font-weight:700">L'IA qui sauve des vies</div>
+  <div style="font-size:12px;color:var(--muted);line-height:1.8;max-width:400px;font-weight:600">Protocoles PSE 2024 · Vidéos Croix-Rouge · Voix VivAI · Validé par Marie, étudiante médecine 5ème année</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;max-width:440px">
+    <div onclick="goTab('chatbot')" style="padding:18px 12px;background:var(--bg2);border:2px solid var(--border);border-radius:12px;cursor:pointer;text-align:center"><div style="font-size:24px;margin-bottom:6px">💬</div><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px">Chatbot IA</div></div>
+    <div onclick="goTab('formation')" style="padding:18px 12px;background:var(--bg2);border:2px solid var(--border);border-radius:12px;cursor:pointer;text-align:center"><div style="font-size:24px;margin-bottom:6px">🎬</div><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px">Formation</div></div>
+    <div onclick="goTab('quiz')" style="padding:18px 12px;background:var(--bg2);border:2px solid var(--border);border-radius:12px;cursor:pointer;text-align:center"><div style="font-size:24px;margin-bottom:6px">✅</div><div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px">Quiz PSE</div></div>
+  </div>
+  <div style="padding:12px 16px;background:var(--red-light);border:1px solid var(--red-border);border-radius:10px;font-size:10px;color:var(--red);max-width:400px;line-height:1.7;font-weight:700">⚠️ En urgence réelle : <strong>15 · 18 · 112</strong><br><span style="color:#9CA3AF;font-weight:600">Bêta réservée SPB Beuzeville</span></div>
+</div>
+
+<!-- CHATBOT -->
+<div class="panel active" id="panel-chatbot">
+  <div class="profile-row">
+    <span class="prof-label">Profil :</span>
+    <button class="prof-btn active" onclick="setProfil(this,'pse')">PSE / Pompiers</button>
+    <button class="prof-btn" onclick="setProfil(this,'psc1')">PSC1</button>
+    <button class="prof-btn" onclick="setProfil(this,'pro')">Pro santé</button>
+    <button class="prof-btn" onclick="setProfil(this,'grand_public')">Grand public</button>
+  </div>
+  <div class="chat-box">
+    <div class="chat-msgs" id="msgs">
+      <div class="msg ai">
+        <div class="msg-label">VivAI</div>
+        <div class="msg-bubble">Bonjour ! Je suis <strong>VivAI</strong>, ton assistant pédagogique premiers secours.<br><br>Protocoles PSE 2024 · Validé médicalement par Marie.<br><br>⚠️ En urgence réelle : <strong>15 · 18 · 112</strong><br><br>Quelle est ta question ?</div>
+      </div>
+    </div>
+    <div class="sugs">
+      <button class="sug" onclick="sendSug('RCP adulte protocole PSE complet')">RCP adulte</button>
+      <button class="sug" onclick="sendSug('RCP enfant PSE 15:2 insufflations initiales')">RCP enfant</button>
+      <button class="sug" onclick="sendSug('RCP nourrisson 2 pouces encerclement thoracique')">RCP nourrisson</button>
+      <button class="sug" onclick="sendSug('OBVA étouffement adulte')">OBVA adulte</button>
+      <button class="sug" onclick="sendSug('PLS inconscient qui respire')">PLS</button>
+      <button class="sug" onclick="sendSug('Hémorragie externe compression garrot')">Hémorragie</button>
+    </div>
+    <div class="input-row">
+      <input class="chat-input" id="chat-in" placeholder="Pose ta question..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"/>
+      <button class="send-btn" id="send-btn" onclick="sendMsg()">Envoyer →</button>
+    </div>
+  </div>
+</div>
+
+<!-- FORMATION -->
+<div class="panel" id="panel-formation">
+  <div class="gestes-grid">
+    <div class="geste-card" onclick="openGeste(event,'rcp_adulte')"><div class="geste-icon">❤️</div><div class="geste-name">RCP Adulte</div></div>
+    <div class="geste-card" onclick="openGeste(event,'rcp_nour')"><div class="geste-icon">👶</div><div class="geste-name">RCP Nourrisson</div></div>
+    <div class="geste-card" onclick="openGeste(event,'obva')"><div class="geste-icon">🫁</div><div class="geste-name">OBVA Adulte</div></div>
+    <div class="geste-card" onclick="openGeste(event,'pls')"><div class="geste-icon">🛡️</div><div class="geste-name">PLS</div></div>
+    <div class="geste-card" onclick="openGeste(event,'hemorragie')"><div class="geste-icon">🩹</div><div class="geste-name">Hémorragie</div></div>
+    <div class="geste-card" onclick="openGeste(event,'nour_heim')"><div class="geste-icon">🍼</div><div class="geste-name">OBVA Nourrisson</div></div>
+  </div>
+  <div id="video-detail" style="display:none"></div>
+</div>
+
+<!-- QUIZ -->
+<div class="panel" id="panel-quiz">
+  <div id="quiz-home">
+    <div class="quiz-header">
+      <div class="quiz-title">Quiz PSE</div>
+      <div class="quiz-sub">Protocoles PSE 2024 · Validé par Marie<br>Étudiante médecine 5ème année · Rouen</div>
+      <div class="levels">
+        <button class="lvl active" onclick="setLvl(this,'pse')">PSE 1/2</button>
+        <button class="lvl" onclick="setLvl(this,'psc1')">PSC1</button>
+        <button class="lvl" onclick="setLvl(this,'pro')">Pro</button>
+      </div>
+      <button class="start-btn" onclick="startQuiz()">Commencer →</button>
+    </div>
+  </div>
+  <div id="quiz-active" style="display:none"></div>
+</div>
+
+<!-- FEEDBACK -->
+<div class="panel" id="panel-feedback">
+  <div class="fb-card">
+    <div class="fb-title">Votre feedback bêta SPB</div>
+    <div class="fb-sub">Vous êtes parmi les premiers testeurs VivAI. Votre retour est précieux.</div>
+    <div id="fb-form">
+      <div class="fb-field"><label class="fb-label">Prénom (facultatif)</label><input class="fb-input" id="fb-nom" placeholder="Ex : Lucas"></div>
+      <div class="fb-field"><label class="fb-label">Note globale</label><div class="stars" id="stars"><span class="star" onclick="setStar(1)">★</span><span class="star" onclick="setStar(2)">★</span><span class="star" onclick="setStar(3)">★</span><span class="star" onclick="setStar(4)">★</span><span class="star" onclick="setStar(5)">★</span></div></div>
+      <div class="fb-field"><label class="fb-label">Ce qui est utile</label><textarea class="fb-ta" id="fb-utile" placeholder="Les vidéos, la voix, les explications..."></textarea></div>
+      <div class="fb-field"><label class="fb-label">Ce qui doit s'améliorer</label><textarea class="fb-ta" id="fb-amelio" placeholder="Interface, vitesse, protocoles..."></textarea></div>
+      <div class="fb-field"><label class="fb-label">Erreur médicale trouvée ?</label>
+        <select class="fb-select" id="fb-err" onchange="document.getElementById('fb-err-detail').style.display=this.value==='oui'?'block':'none'">
+          <option value="">— Sélectionner —</option><option value="non">Non, tout est correct</option><option value="oui">Oui, j'en ai trouvé une</option>
+        </select>
+      </div>
+      <div class="fb-field" id="fb-err-detail" style="display:none"><label class="fb-label">Décrire l'erreur</label><textarea class="fb-ta" id="fb-err-txt" placeholder="Décrivez précisément..."></textarea></div>
+      <button class="fb-btn" onclick="submitFb()">Envoyer mon feedback →</button>
+    </div>
+    <div style="text-align:center;padding:30px;display:none" id="fb-ok"><div style="font-size:40px;margin-bottom:12px">✓</div><div style="font-family:'Playfair Display',serif;font-size:16px;font-weight:700;margin-bottom:6px">Merci !</div><div style="font-size:11px;color:var(--muted);font-weight:600">Votre retour a été enregistré.</div></div>
+  </div>
+</div>
+
+<div class="footer">VivAI Bêta SPB Beuzeville · Protocoles PSE 2024 · Validé Marie · En urgence : <strong>15 · 18 · 112</strong></div>
+</div>
+
+<script>
+'use strict';
+
+const GENERAL_AUDIO={
+  bienvenue:'bienvenu général.mp3',
+  urgence:'urgence générale.mp3',
+  calme:'général-calme.mp3',
+  bravo:'général-bravo.mp3',
+  courage:'Courage général.mp3',
+  tempoStart:'Début à tempo général.mp3',
+  tempo30:'tempo général-30.mp3',
+  tempo15:'tempo-général-15.mp3',
+  repete:'répétition générale.mp3',
+  suivant:'général-suivant.mp3',
+  pasCompris:'général-pas-compris.mp3',
+  finModule:'module-fin-général.mp3',
+  quizBravo:'quiz-général-bravo.mp3',
+  quizErreur:'erreur-quiz-général.mp3',
+  quizBien:'quiz-général-bien.mp3',
+  quizMoyen:'quiz général-moyen.mp3',
+  micEcoute:'écoute-micro-générale.mp3',
+};
+const BASE_URL='https://terrierlucas02-oss.github.io/VivAI/';
+function playGeneral(key){
+  const f=GENERAL_AUDIO[key];
+  if(!f) return;
+  const a=new Audio(BASE_URL+encodeURIComponent(f));
+  a.play().catch(()=>{});
+}
+const GESTES={
+  rcp_adulte:{name:'RCP Adulte (8 ans et plus)',ytId:'NIbTiTTYDrY',source:'Croix-Rouge Belgique',audioFiles:['rcp-adulte-01.mp3','rcp-adulte-02.mp3','rcp-adulte-03.mp3','rcp-adulte-04.mp3','rcp-adulte-05.mp3','rcp-adulte-06.mp3'],voiceText:"Appelle le quinze, le dix-huit ou le cent douze tout de suite. Place le talon de ta main au centre du sternum. Trente compressions à cinq ou six centimètres. Deux souffles. Continue sans t'arrêter jusqu'aux secours.",showTempo:true,steps:[{txt:"Appelle <strong>15/18/112</strong> immédiatement — reste en ligne",crit:true},{txt:"Allonge sur le dos, surface dure",crit:false},{txt:"Talon de main au <strong>centre du sternum</strong> — autre main par-dessus",crit:true},{txt:"<strong>30 compressions</strong> — 5–6 cm — 100 à 120/min",crit:true},{txt:"2 souffles si possible (ou mains seules)",crit:false},{txt:"Continue <strong>sans interruption</strong> jusqu'aux secours",crit:true}]},
+  rcp_nour:{name:'RCP Nourrisson (moins de 1 an)',ytId:'__O6RAjyJpg',source:'Croix-Rouge Belgique',audioFiles:['rcp-nour-01.mp3','rcp-nour-02.mp3','rcp-nour-03.mp3','rcp-nour-04.mp3','rcp-nour-05.mp3','rcp-nour-06.mp3'],voiceText:"Appelle le quinze immédiatement. Cinq souffles doux sur la bouche ET le nez du bébé. Encercle son thorax avec tes deux mains. Deux pouces au centre du sternum. Quinze compressions. Deux souffles. Continue.",showTempo:false,steps:[{txt:"Appelle <strong>15/18/112</strong> tout de suite",crit:true},{txt:"<strong>5 souffles initiaux</strong> — bouche ET nez du bébé",crit:true},{txt:"Encercler le thorax — <strong>2 pouces au centre du sternum</strong>",crit:true},{txt:"<strong>15 compressions</strong> — 1/3 épaisseur thorax",crit:true},{txt:"2 souffles — alterner 15:2 sans interruption",crit:false}]},
+  obva:{name:'OBVA Étouffement — Adulte / Enfant',ytId:'s09_qemnNBQ',source:'Croix-Rouge Belgique',audioFiles:['heim-adulte-01.mp3','heim-adulte-02.mp3','heim-adulte-03.mp3','heim-adulte-04.mp3','heim-adulte-05.mp3'],voiceText:"La personne s'étouffe et ne peut plus parler. Penche-la vers l'avant. Cinq grandes claques dans le dos entre les omoplates. Si inefficace, poing entre le nombril et le sternum. Cinq compressions vers le haut. Alterne.",showTempo:false,steps:[{txt:"S'étouffe = ne peut plus parler → <strong>agir immédiatement</strong>",crit:true},{txt:"Pencher en avant — <strong>5 claques dans le dos</strong> entre les omoplates",crit:true},{txt:"Si inefficace : poing entre nombril et sternum",crit:false},{txt:"<strong>5 compressions abdominales</strong> vers le haut et vers soi",crit:true},{txt:"Alterner claques/compressions — perte de connaissance → RCP",crit:false}]},
+  pls:{name:'PLS — Position Latérale de Sécurité',ytId:'NIAmZJDca_s',source:'Croix-Rouge Belgique',audioFiles:['pls-01.mp3','pls-02.mp3','pls-03.mp3','pls-04.mp3','pls-05.mp3'],voiceText:"La personne est inconsciente mais respire. Place son bras à angle droit. Plie le genou opposé. Bascule-la doucement sur le côté. Surveille sa respiration toutes les deux minutes.",showTempo:false,steps:[{txt:"Vérifier conscience + respiration <strong>10 secondes max</strong>",crit:false},{txt:"Inconscient + respire → PLS · Ne respire pas → RCP",crit:true},{txt:"Bras proche à <strong>angle droit</strong>, paume vers le haut",crit:false},{txt:"Plier le genou opposé — basculer doucement sur le côté",crit:false},{txt:"Surveiller la respiration <strong>toutes les 2 minutes</strong>",crit:true}]},
+  hemorragie:{name:'Hémorragie Externe',ytId:'PgFMLYhyhSU',source:'Croix-Rouge française',audioFiles:['hem-01.mp3','hem-02.mp3','hem-03.mp3','hem-04.mp3','hem-05.mp3','hem-06.mp3'],voiceText:"Appuie très fort sur la plaie avec un tissu propre. Ne relâche jamais. Allonge la personne et couvre-la pour éviter l'hypothermie. Le garrot en dernier recours seulement.",showTempo:false,steps:[{txt:"<strong>Comprimer immédiatement et fortement</strong> avec tissu propre",crit:true},{txt:"Ne relâcher jamais — tissu imbibé : ajouter par-dessus",crit:true},{txt:"<strong>Allonger et couvrir</strong> — éviter l'hypothermie (triade de la mort)",crit:true},{txt:"Appeler le 15 — surveiller l'état de conscience",crit:false},{txt:"Garrot <strong>en dernier recours</strong> si membre et compression impossible — noter l'heure",crit:false}]},
+  nour_heim:{name:'OBVA Nourrisson',ytId:'cDmo182X-LI',source:'Croix-Rouge française',audioFiles:['heim-nour-01.mp3','heim-nour-02.mp3','heim-nour-03.mp3','heim-nour-04.mp3','heim-nour-05.mp3'],voiceText:"Le bébé s'étouffe. Mets-le face vers le bas sur ton avant-bras, tête plus basse que le corps. Cinq claques dans le dos. Retourne-le. Cinq compressions thoraciques. Jamais sur le ventre d'un bébé.",showTempo:false,steps:[{txt:"Face vers le bas sur l'avant-bras — <strong>tête plus basse que le corps</strong>",crit:true},{txt:"<strong>5 claques dans le dos</strong> avec le talon de la main",crit:true},{txt:"Retourner sur le dos — <strong>5 compressions thoraciques</strong> (2 doigts)",crit:true},{txt:"<strong>JAMAIS</strong> de compressions abdominales sur un nourrisson",crit:true},{txt:"Alterner claques/compressions — appeler le 15",crit:false}]}
+};
+
+function goTab(t){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+t).classList.add('active');
+  document.getElementById('tab-'+t).classList.add('active');
+  window.scrollTo(0,0);
+}
+
+let tempoInterval=null,tempoCount=0;
+
+function openGeste(e,id){
+  stopTempo(); stopVoice();
+  document.querySelectorAll('.geste-card').forEach(c=>c.classList.remove('active'));
+  e.currentTarget.classList.add('active');
+  const g=GESTES[id];
+  const detail=document.getElementById('video-detail');
+  detail.style.display='block';
+  detail.innerHTML=`
+    <div class="video-player">
+      <div class="video-header">
+        <div class="video-title">${g.name}</div>
+        <button class="close-btn" onclick="closeGeste()">✕</button>
+      </div>
+      <div class="voice-bar">
+        <div class="voice-icon">🎙</div>
+        <div class="voice-text"><strong style="color:#C0392B">Voix VivAI</strong> — Guidage audio de l'étape</div>
+        <button class="voice-play" id="vbtn-${id}" onclick="playVoice('${id}')">▶ Écouter</button>
+      </div>
+      <div class="yt-wrap">
+        <iframe src="https://www.youtube.com/embed/${g.ytId}?rel=0&modestbranding=1" title="${g.name}" allowfullscreen loading="lazy"></iframe>
+      </div>
+      <div class="yt-source">Vidéo : ${g.source} — Protocole PSE 2024</div>
+      <div class="tempo-section${g.showTempo?' visible':''}" id="tempo-${id}">
+        <div class="tempo-title">Tempo RCP — 100 à 120 compressions/min</div>
+        <div class="tempo-row">
+          <div class="tempo-heart" id="tempo-heart">❤️</div>
+          <div class="tempo-info">
+            <div class="tempo-count" id="tempo-count">0</div>
+            <div class="tempo-sub" id="tempo-sub">Appuie sur START pour le tempo</div>
+            <div class="tempo-dots" id="tempo-dots"></div>
+          </div>
+          <button class="tempo-btn" id="tempo-btn" onclick="startTempo()">START</button>
+        </div>
+      </div>
+      <div class="steps-section">
+        <div class="steps-title">Protocole PSE — pas à pas</div>
+        ${g.steps.map((s,i)=>`<div class="step-item"><div class="step-n${s.crit?' crit':''}">${i+1}</div><div class="step-txt">${s.txt}</div></div>`).join('')}
+      </div>
+      <div class="disclaimer">⚠️ Outil pédagogique — En urgence réelle : 15 · 18 · 112</div>
+    </div>`;
+  detail.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function closeGeste(){
+  stopTempo(); stopVoice();
+  document.getElementById('video-detail').style.display='none';
+  document.querySelectorAll('.geste-card').forEach(c=>c.classList.remove('active'));
+}
+
+let currentAudio=null, currentAudioIdx=0, currentAudioId=null;
+
+function playVoice(id){
+  const g=GESTES[id];
+  const btn=document.getElementById('vbtn-'+id);
+  // Si déjà en lecture → stop
+  if(currentAudio&&!currentAudio.paused){
+    currentAudio.pause();
+    currentAudio=null;
+    if(btn){btn.textContent='▶ Écouter';btn.classList.remove('playing');}
+    return;
+  }
+  currentAudioId=id; currentAudioIdx=0;
+  playNextAudio(id);
+}
+
+function playNextAudio(id){
+  const g=GESTES[id];
+  const btn=document.getElementById('vbtn-'+id);
+  const files=g.audioFiles||[];
+  if(currentAudioIdx>=files.length){
+    if(btn){btn.textContent='▶ Écouter';btn.classList.remove('playing');}
+    return;
+  }
+  const baseUrl='https://terrierlucas02-oss.github.io/VivAI-beta/';
+  const audio=new Audio(baseUrl+files[currentAudioIdx]);
+  currentAudio=audio;
+  if(btn){btn.textContent='⏹ Stop';btn.classList.add('playing');}
+  audio.onended=()=>{
+    currentAudioIdx++;
+    if(currentAudioId===id) playNextAudio(id);
+  };
+  audio.onerror=()=>{
+    // Pas de fallback navigateur — on ne joue rien si MP3 manquant
+    if(btn){btn.textContent='▶ Écouter';btn.classList.remove('playing');}
+    currentAudio=null;
+  };
+  audio.play();
+}
+
+function stopVoice(){
+  if(currentAudio){currentAudio.pause();currentAudio=null;}
+  if(window.speechSynthesis)speechSynthesis.cancel();
+  currentAudioId=null;
+}
+
+function startTempo(){
+  stopTempo(); tempoCount=0;
+  const dots=document.getElementById('tempo-dots');
+  if(!dots) return;
+  dots.innerHTML=Array.from({length:30},(_,i)=>`<div class="tempo-dot" id="td-${i}"></div>`).join('');
+  document.getElementById('tempo-btn').textContent='RESET';
+  function bip(f){try{const ac=new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.connect(g);g.connect(ac.destination);o.frequency.value=f;g.gain.setValueAtTime(0.3,ac.currentTime);g.gain.exponentialRampToValueAtTime(0.001,ac.currentTime+0.08);o.start(ac.currentTime);o.stop(ac.currentTime+0.08);}catch(e){}}
+  tempoInterval=setInterval(()=>{
+    if(tempoCount>=30){clearInterval(tempoInterval);const s=document.getElementById('tempo-sub');if(s)s.textContent='✓ 30 compressions — 2 souffles puis recommencer';const b=document.getElementById('tempo-btn');if(b)b.textContent='START';return;}
+    tempoCount++;
+    const h=document.getElementById('tempo-heart'),c=document.getElementById('tempo-count'),s=document.getElementById('tempo-sub');
+    if(c)c.textContent=tempoCount;
+    if(s)s.textContent=tempoCount<=10?'Appuie fort !':tempoCount<=20?'Continue !':'Presque fini !';
+    if(h){h.classList.add('beat');setTimeout(()=>h.classList.remove('beat'),100);}
+    for(let i=0;i<30;i++){const d=document.getElementById('td-'+i);if(!d)continue;d.classList.remove('done','current');if(i<tempoCount-1)d.classList.add('done');else if(i===tempoCount-1)d.classList.add('current');}
+    bip(tempoCount%4===0?880:660);
+  },545);
+}
+function stopTempo(){if(tempoInterval)clearInterval(tempoInterval);tempoInterval=null;tempoCount=0;}
+
+let profil='pse',isLoading=false;
+const SYS=`Tu es VivAI, IA pédagogique premiers secours. Profil : {P}.
+RÈGLE : En urgence réelle → 15/18/112 en premier. Tu es un outil PÉDAGOGIQUE.
+Protocoles PSE 2024 · DGSCGC · ILCOR 2024
+PSE : RCP enfant/nourrisson 5 insuf. initiales puis 15:2 · Nourrisson 2 pouces + encerclement
+Hémorragie : allonger+couvrir (hypothermie=triade mort) · garrot DERNIER recours
+Malaise : NE PAS surélever jambes
+Format : max 180 mots · étapes numérotées · ⚠️ 15·18·112 en fin si urgence`;
+
+function setProfil(btn,p){document.querySelectorAll('.prof-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');profil=p;}
+function addMsg(role,html){const c=document.getElementById('msgs');const d=document.createElement('div');d.className='msg '+role;d.innerHTML=`<div class="msg-label">${role==='ai'?'VivAI':'Vous'}</div><div class="msg-bubble">${html}</div>`;c.appendChild(d);c.scrollTop=c.scrollHeight;}
+function addTyping(){const c=document.getElementById('msgs');const d=document.createElement('div');d.className='msg ai';d.id='typing';d.innerHTML=`<div class="msg-label">VivAI</div><div class="typing-bubble"><div class="td"></div><div class="td"></div><div class="td"></div></div>`;c.appendChild(d);c.scrollTop=c.scrollHeight;}
+async function sendMsg(){const inp=document.getElementById('chat-in');const msg=inp.value.trim();if(!msg||isLoading)return;inp.value='';addMsg('user',msg);await callAI(msg);}
+async function sendSug(msg){if(isLoading)return;addMsg('user',msg);await callAI(msg);}
+async function callAI(msg){
+  isLoading=true;document.getElementById('send-btn').disabled=true;addTyping();
+  try{
+    const res=await fetch('https://api.groq.com/openai/v1/chat/completions',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer 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'},
+      body:JSON.stringify({
+        model:'llama-3.3-70b-versatile',
+        max_tokens:1000,
+        messages:[
+          {role:'system',content:SYS.replace('{P}',profil)},
+          {role:'user',content:msg}
+        ]
+      })
+    });
+    const data=await res.json();
+    document.getElementById('typing')?.remove();
+    const text=(data.choices?.[0]?.message?.content||'Erreur.').replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+    addMsg('ai',text);
+  }catch(e){document.getElementById('typing')?.remove();addMsg('ai','Erreur de connexion.<br><br>⚠️ En urgence : <strong>15 · 18 · 112</strong>');}
+  isLoading=false;document.getElementById('send-btn').disabled=false;
+}
+
+const QS={
+  pse:[
+    {q:"En PSE, quel est le ratio RCP pour l'enfant ?",opts:["30:2 comme l'adulte","15:2 avec 5 insufflations initiales","15:1","20:2"],ok:1,exp:"En PSE, l'enfant commence par 5 insufflations initiales car l'arrêt est souvent respiratoire. Puis 15:2. Validé par Marie."},
+    {q:"Pour la RCP nourrisson PSE, quelle technique ?",opts:["2 doigts","1 pouce","2 pouces + encerclement thoracique","Paume d'une main"],ok:2,exp:"L'encerclement thoracique avec 2 pouces est recommandé — plus efficace et plus simple pour localiser le sternum."},
+    {q:"Pour l'hémorragie externe, quelle est la priorité ?",opts:["Garrot immédiat","Compression + allonger + couvrir","Surélever le membre","Appeler d'abord"],ok:1,exp:"Compression directe TOUJOURS en premier. Allonger et couvrir contre l'hypothermie. Garrot = dernier recours (risque de prothèse)."},
+    {q:"Pour un malaise vagal conscient, que ne faut-il PAS faire ?",opts:["Appeler le 15","Surélever les jambes","Rester avec la victime","Vérifier le diabète"],ok:1,exp:"Surélever les jambes est contre-indiqué pour le malaise vagal — plus délétère selon Marie. On soutient la personne."},
+    {q:"Pour l'OBVA nourrisson, que ne faut-il JAMAIS faire ?",opts:["Claques dans le dos","Compressions thoraciques","Compressions abdominales","Appeler le 15"],ok:2,exp:"JAMAIS de compressions abdominales sur un nourrisson. Technique : claques dos + compressions thoraciques uniquement."},
+  ],
+  psc1:[
+    {q:"Quelle est la fréquence des compressions RCP adulte ?",opts:["60 à 80/min","100 à 120/min","80 à 100/min","120 à 140/min"],ok:1,exp:"100 à 120 compressions par minute selon ILCOR 2024."},
+    {q:"Quelle profondeur pour les compressions thoraciques adulte ?",opts:["2 à 3 cm","3 à 4 cm","5 à 6 cm","7 à 8 cm"],ok:2,exp:"5 à 6 cm chez l'adulte. Trop superficiel = inefficace."},
+    {q:"Victime inconsciente qui respire — quelle attitude ?",opts:["RCP immédiate","PLS + appeler le 15","Lui donner à boire","Attendre"],ok:1,exp:"PLS pour éviter l'inhalation + appel au 15. RCP uniquement si ne respire plus."},
+  ],
+  pro:[
+    {q:"Selon ILCOR 2024, durée max du no-flow time lors d'un choc DAE ?",opts:["2 secondes","5 secondes","10 secondes","15 secondes"],ok:1,exp:"Moins de 5 secondes. Comprimer jusqu'à charge terminée, choc, reprendre immédiatement."},
+    {q:"En rythme non choquable (ERC 2024), quand l'adrénaline ?",opts:["Dès que possible","Après 2 min","Après 6 min","Après DAE"],ok:0,exp:"En rythme non choquable : adrénaline 1mg IV/IO dès que possible. Rythmes choquables : après le 3ème choc."},
+  ]
+};
+
+let ql='pse',qi=0,qs=0,qa=false;
+function setLvl(btn,l){document.querySelectorAll('.lvl').forEach(b=>b.classList.remove('active'));btn.classList.add('active');ql=l;}
+function startQuiz(){qi=0;qs=0;qa=false;document.getElementById('quiz-home').style.display='none';document.getElementById('quiz-active').style.display='block';renderQ();}
+function renderQ(){const q=QS[ql]||QS.pse;if(qi>=q.length){showResult(q.length);return;}qa=false;document.getElementById('quiz-active').innerHTML=`<div class="quiz-card"><div class="quiz-bar"><div class="quiz-prog">Question ${qi+1}/${q.length}</div><div class="quiz-score">Score : ${qs}/${qi}</div></div><div class="quiz-body"><div class="quiz-q">${q[qi].q}</div><div class="quiz-opts">${q[qi].opts.map((o,i)=>`<button class="quiz-opt" onclick="answerQ(${i})">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}</div></div></div>`;}
+function answerQ(idx){if(qa)return;qa=true;const q=QS[ql][qi];document.querySelectorAll('.quiz-opt').forEach((o,i)=>{o.disabled=true;if(i===q.ok)o.classList.add('correct');else if(i===idx&&idx!==q.ok)o.classList.add('wrong');});if(idx===q.ok)qs++;const body=document.querySelector('.quiz-body');const fb=document.createElement('div');fb.className='quiz-fb';fb.innerHTML=`<strong>${idx===q.ok?'✓ Bonne réponse':'✗ Mauvaise réponse'}</strong><br><br>${q.exp}`;const nx=document.createElement('button');nx.className='quiz-next';nx.textContent=qi+1<(QS[ql]||QS.pse).length?'Suivant →':'Résultat →';nx.onclick=()=>{qi++;renderQ();};body.appendChild(fb);body.appendChild(nx);}
+function showResult(total){const pct=Math.round(qs/total*100);const m=pct>=80?'Excellent !':pct>=60?'Bien joué !':pct>=40?'À revoir':'Continue !';document.getElementById('quiz-active').innerHTML=`<div class="quiz-card" style="padding:36px 24px;text-align:center"><div style="font-family:'Playfair Display',serif;font-size:56px;font-weight:900;color:var(--red);line-height:1">${pct}%</div><div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;margin:10px 0 6px">${m}</div><div style="font-size:12px;color:var(--muted);margin-bottom:20px;font-weight:600">${qs} bonne${qs>1?'s':''} réponse${qs>1?'s':''} sur ${total}</div><div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="start-btn" onclick="startQuiz()">Recommencer</button><button class="start-btn" style="background:var(--bg3);color:var(--text)" onclick="document.getElementById('quiz-home').style.display='block';document.getElementById('quiz-active').style.display='none'">Changer de niveau</button></div></div>`;}
+
+let fbStars=0;
+function setStar(n){fbStars=n;document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('on',i<n));}
+function submitFb(){const d={nom:document.getElementById('fb-nom').value,note:fbStars,utile:document.getElementById('fb-utile').value,amelio:document.getElementById('fb-amelio').value,erreur:document.getElementById('fb-err').value,erreurTxt:document.getElementById('fb-err-txt')?.value||'',date:new Date().toLocaleDateString('fr-FR'),version:'Beta-SPB-v2.0'};const fb=JSON.parse(localStorage.getItem('vivai_feedbacks')||'[]');fb.push(d);localStorage.setItem('vivai_feedbacks',JSON.stringify(fb));document.getElementById('fb-form').style.display='none';document.getElementById('fb-ok').style.display='block';}
+
+if(window.speechSynthesis){speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=()=>speechSynthesis.getVoices();}
+</script>
+</body>
+</html>
